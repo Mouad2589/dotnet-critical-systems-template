@@ -26,11 +26,11 @@ public sealed class Identity
 
         var identity = new Identity
         {
-            Id         = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             NationalId = nationalId,
-            Status     = IdentityStatus.PendingVerification,
-            CreatedAt  = DateTimeOffset.UtcNow,
-            UpdatedAt  = DateTimeOffset.UtcNow
+            Status = IdentityStatus.PendingVerification,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
         };
 
         identity._domainEvents.Add(new IdentityCreatedEvent(identity.Id, nationalId));
@@ -43,7 +43,7 @@ public sealed class Identity
             throw new InvalidOperationException(
                 $"Cannot activate an identity in status '{Status}'.");
 
-        Status    = IdentityStatus.Active;
+        Status = IdentityStatus.Active;
         UpdatedAt = DateTimeOffset.UtcNow;
         _domainEvents.Add(new IdentityActivatedEvent(Id));
     }
@@ -54,7 +54,7 @@ public sealed class Identity
             throw new InvalidOperationException(
                 $"Cannot suspend an identity in status '{Status}'.");
 
-        Status    = IdentityStatus.Suspended;
+        Status = IdentityStatus.Suspended;
         UpdatedAt = DateTimeOffset.UtcNow;
         _domainEvents.Add(new IdentitySuspendedEvent(Id, reason));
     }
