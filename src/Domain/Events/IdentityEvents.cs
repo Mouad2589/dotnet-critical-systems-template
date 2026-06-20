@@ -1,3 +1,5 @@
+using Domain.ValueObjects;
+
 namespace Domain.Events;
 
 public interface IDomainEvent
@@ -8,11 +10,11 @@ public interface IDomainEvent
 
 public sealed record IdentityCreatedEvent(
     Guid IdentityId,
-    Domain.ValueObjects.NationalId NationalId,
+    NationalId NationalId,
     Guid EventId,
     DateTimeOffset OccurredAt) : IDomainEvent
 {
-    public IdentityCreatedEvent(Guid identityId, Domain.ValueObjects.NationalId nationalId)
+    public IdentityCreatedEvent(Guid identityId, NationalId nationalId)
         : this(identityId, nationalId, Guid.NewGuid(), DateTimeOffset.UtcNow) { }
 }
 

@@ -1,5 +1,6 @@
 using Domain.ValueObjects;
 using FluentAssertions;
+using Xunit;
 
 namespace Unit.Domain;
 
@@ -18,14 +19,20 @@ public sealed class NationalIdTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    [InlineData("ab12345678")]   // lowercase rejected
-    [InlineData("AB1234567")]    // too short (7 chars)
+    [InlineData("AB12345")]      // too short (7 chars)
     [InlineData("AB1234567890X")] // too long (13 chars)
     [InlineData("AB-1234567")]   // invalid character
     public void From_WithInvalidFormat_ThrowsArgumentException(string value)
     {
         var act = () => NationalId.From(value);
         act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void From_WithLowercaseInput_NormalisesToUppercase()
+    {
+        var id = NationalId.From("ab12345678");
+        id.Value.Should().Be("AB12345678");
     }
 
     [Fact]

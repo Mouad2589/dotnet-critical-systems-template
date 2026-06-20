@@ -75,6 +75,7 @@ jobs:
           /p:CoverletOutputFormat=opencover
 
       - name: Run integration tests
+        if: hashFiles('tests/Integration/**/*.csproj') != ''
         env:
           ConnectionStrings__Default: "Host=localhost;Port=5432;Database=testdb;Username=testuser;Password=testpassword"
         run: >
@@ -85,6 +86,7 @@ jobs:
           --results-directory ./coverage
 
       - name: Run architecture tests
+        if: hashFiles('tests/Architecture/**/*.csproj') != ''
         run: >
           dotnet test tests/Architecture
           --no-build
@@ -99,7 +101,7 @@ jobs:
           reporttypes: Html;Cobertura;MarkdownSummaryGithub
 
       - name: Publish coverage summary
-        if: always()
+        if: always() && hashFiles('coverage/report/SummaryGithub.md') != ''
         run: cat coverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage report

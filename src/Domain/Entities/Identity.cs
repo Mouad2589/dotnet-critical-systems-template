@@ -1,3 +1,6 @@
+using Domain.Events;
+using Domain.ValueObjects;
+
 namespace Domain.Entities;
 
 /// <summary>
@@ -15,7 +18,7 @@ public sealed class Identity
     private readonly List<IDomainEvent> _domainEvents = [];
     public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    private Identity() { } // EF Core
+    private Identity() { NationalId = null!; } // EF Core
 
     public static Identity Create(NationalId nationalId)
     {

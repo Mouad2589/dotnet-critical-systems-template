@@ -2,6 +2,7 @@ using Domain.Entities;
 using Domain.Events;
 using Domain.ValueObjects;
 using FluentAssertions;
+using Xunit;
 
 namespace Unit.Domain;
 
