@@ -23,3 +23,14 @@ node_modules/
 # Logs
 *.log
 logs/
+docs/architecture.html
+docs/observability.html
+docs/roadmap.html
+docs/security.html
+docs/testing-strategy.html
+README.html
+.github/pull_request_template.html
+.github/ISSUE_TEMPLATE/architecture-proposal.html
+.github/ISSUE_TEMPLATE/bug-report.html
+docs/decisions/ADR-0002-cqrs-with-mediatr.html
+docs/decisions/ADR-0003-outbox-pattern.html

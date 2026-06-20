@@ -77,11 +77,24 @@ This repository is not intended to be a full production system. It is a public a
 
 ## 9. Evolution roadmap
 
-- [ ] Add a first complete architecture decision record.
-- [ ] Add one detailed diagram per major module or flow.
-- [ ] Add implementation examples when relevant.
-- [ ] Add a security checklist.
-- [ ] Add an operational readiness checklist.
+- [x] ADR-0001: public repository scope.
+- [x] ADR-0002: CQRS with MediatR.
+- [x] ADR-0003: Outbox pattern for domain event reliability.
+- [x] Architecture documentation: Clean Architecture, request flow, project structure.
+- [x] Observability documentation: OpenTelemetry, Serilog, metrics, tracing, health checks.
+- [x] Security documentation: JWT, ABAC, input validation, secrets, audit trail.
+- [x] Testing strategy: unit, integration, contract, architecture tests, CI gates.
+- [x] Domain scaffold: `Identity` aggregate, `NationalId` value object, domain events.
+- [x] Application scaffold: `CreateIdentityCommand`, pipeline behaviours.
+- [x] Unit tests: `IdentityTests`, `NationalIdTests`.
+- [x] CI workflow: build, test, coverage gate, vulnerability scan, format check.
+- [x] `global.json`, `Directory.Packages.props`, `.editorconfig`.
+- [ ] Infrastructure scaffold: EF Core DbContext, `IdentityRepository`, outbox table migration.
+- [ ] API scaffold: Minimal API endpoints, OpenAPI spec.
+- [ ] Integration test project with Testcontainers.
+- [ ] Architecture test project with NetArchTest.
+- [ ] `docker-compose.yml` infra config files (OTel Collector, Prometheus, Tempo, Loki, Grafana).
+- [ ] GitHub Actions CI badge in README.
 
 ## 10. Related repositories
 

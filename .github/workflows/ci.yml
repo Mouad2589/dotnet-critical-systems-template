@@ -1,0 +1,182 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+
+  # ─── Structure check (fast, always runs) ─────────────────────────────────
+  structure:
+    name: Repository structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          test -f README.md
+          test -f SECURITY.md
+          test -f CONTRIBUTING.md
+          test -f docs/roadmap.md
+          test -f docs/decisions/ADR-0001-public-repository-scope.md
+          test -f global.json
+          test -f docker-compose.yml
+
+  # ─── Build & Test ─────────────────────────────────────────────────────────
+  build-and-test:
+    name: Build, test & coverage
+    runs-on: ubuntu-latest
+    needs: structure
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build (no warnings allowed)
+        run: dotnet build --no-restore --configuration Release -warnaserror
+
+      - name: Run unit tests with coverage
+        run: >
+          dotnet test tests/Unit
+          --no-build
+          --configuration Release
+          --logger "trx;LogFileName=unit-results.trx"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
+          /p:CoverletOutputFormat=opencover
+
+      - name: Run integration tests
+        env:
+          ConnectionStrings__Default: "Host=localhost;Port=5432;Database=testdb;Username=testuser;Password=testpassword"
+        run: >
+          dotnet test tests/Integration
+          --no-build
+          --configuration Release
+          --logger "trx;LogFileName=integration-results.trx"
+          --results-directory ./coverage
+
+      - name: Run architecture tests
+        run: >
+          dotnet test tests/Architecture
+          --no-build
+          --configuration Release
+          --logger "trx;LogFileName=arch-results.trx"
+
+      - name: Generate coverage report
+        uses: danielpalme/ReportGenerator-GitHub-Action@5
+        with:
+          reports: coverage/**/coverage.opencover.xml
+          targetdir: coverage/report
+          reporttypes: Html;Cobertura;MarkdownSummaryGithub
+
+      - name: Publish coverage summary
+        if: always()
+        run: cat coverage/report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/report
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+          retention-days: 14
+
+      - name: Coverage gate (80 % line coverage)
+        uses: danielpalme/ReportGenerator-GitHub-Action@5
+        with:
+          reports: coverage/**/coverage.opencover.xml
+          targetdir: coverage/gate
+          reporttypes: Cobertura
+          minimumCoverageThresholds: "lineCoverage:80"
+
+  # ─── Security scan ────────────────────────────────────────────────────────
+  security:
+    name: Vulnerability scan
+    runs-on: ubuntu-latest
+    needs: structure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Check for vulnerable packages
+        run: dotnet list package --vulnerable --include-transitive 2>&1 | tee vuln-report.txt
+
+      - name: Fail on high/critical vulnerabilities
+        run: |
+          if grep -qiE "(High|Critical)" vuln-report.txt; then
+            echo "::error::High or Critical vulnerabilities found. See vuln-report.txt."
+            exit 1
+          fi
+
+      - name: Upload vulnerability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: vuln-report.txt
+          retention-days: 30
+
+  # ─── Code style ───────────────────────────────────────────────────────────
+  format:
+    name: Code format check
+    runs-on: ubuntu-latest
+    needs: structure
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
