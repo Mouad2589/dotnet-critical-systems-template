@@ -21,7 +21,7 @@
 - [ ] `docker-compose.yml` — local dev environment (PostgreSQL, Redis, OTEL Collector, Grafana).
 - [ ] ADR-0002: CQRS and MediatR.
 - [ ] ADR-0003: Outbox pattern.
-- [ ] ADR-0004: PostgreSQL as primary data store.
+- [x] ADR-0004: PostgreSQL as primary data store.
 
 ## Phase 3 — Public authority
 

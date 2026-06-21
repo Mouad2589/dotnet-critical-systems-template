@@ -1,5 +1,9 @@
 # .NET Critical Systems Template
 
+[![CI](https://github.com/Mouad2589/dotnet-critical-systems-template/actions/workflows/ci.yml/badge.svg)](https://github.com/Mouad2589/dotnet-critical-systems-template/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4)](https://dotnet.microsoft.com/)
+
 > Public portfolio repository by **Mouad SAINDOU** — Engineering Leader focused on Digital Identity, eGovernment, Critical Systems and .NET platforms.
 
 ## 1. Context

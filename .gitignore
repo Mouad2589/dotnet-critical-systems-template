@@ -34,3 +34,4 @@ README.html
 .github/ISSUE_TEMPLATE/bug-report.html
 docs/decisions/ADR-0002-cqrs-with-mediatr.html
 docs/decisions/ADR-0003-outbox-pattern.html
+docs/decisions/ADR-0004-postgresql-primary-data-store.html
